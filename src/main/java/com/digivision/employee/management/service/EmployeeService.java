@@ -46,10 +46,10 @@ public class EmployeeService {
             logger.error("Invalid email: {}", employee.getEmail());
             throw new InvalidInputException("Invalid email address.");
         }
-//
-//        if (!departmentValidationService.isValidDepartment(employee.getDepartment())) {
-//            throw new InvalidInputException("Invalid department.");
-//        }
+
+        if (!departmentValidationService.isValidDepartment(employee.getDepartment())) {
+            throw new InvalidInputException("Invalid department.");
+        }
 
         Employee savedEmployee = employeeRepository.save(employee);
         logger.info("Employee saved successfully");
