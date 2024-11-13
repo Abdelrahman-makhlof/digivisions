@@ -52,7 +52,7 @@ public class EmployeeServiceTest {
         employee.setId(employeeId);
         employee.setFirstName("John");
         employee.setLastName("Doe");
-        employee.setEmail("john.doe@example.com");
+        employee.setEmail("abdelrahman@gmail.com");
         employee.setDepartment("Engineering");
         employee.setSalary(50000.0);
     }
@@ -61,6 +61,7 @@ public class EmployeeServiceTest {
     public void testCreateEmployee_Success() throws ThirdPartyException {
         // Arrange
         when(emailValidationService.isValidEmail(employee.getEmail())).thenReturn(true);
+        when(departmentValidationService.isValidDepartment(employee.getDepartment())).thenReturn(true);
         when(employeeRepository.save(employee)).thenReturn(employee);
 
         // Act
@@ -116,9 +117,9 @@ public class EmployeeServiceTest {
         // Arrange
         Employee updatedEmployee = new Employee();
         updatedEmployee.setId(UUID.randomUUID());
-        updatedEmployee.setFirstName("Jane");
-        updatedEmployee.setLastName("Doe");
-        updatedEmployee.setEmail("jane.doe@example.com");
+        updatedEmployee.setFirstName("Abdelrahman");
+        updatedEmployee.setLastName("Ahmed");
+        updatedEmployee.setEmail("abdelrahman.ahmed@gmail.com");
         updatedEmployee.setDepartment("HR");
         updatedEmployee.setSalary(55000.0);
 
@@ -130,8 +131,9 @@ public class EmployeeServiceTest {
 
         // Assert
         assertNotNull(result);
-        assertEquals("Jane", result.getFirstName());
+        assertEquals("Abdelrahman", result.getFirstName());
         assertEquals("HR", result.getDepartment());
+        assertEquals(55000.0, result.getSalary());
         verify(employeeRepository, times(1)).findById(any(UUID.class));
         verify(employeeRepository, times(1)).save(any());
     }
@@ -141,19 +143,17 @@ public class EmployeeServiceTest {
         // Arrange
         when(employeeRepository.findById(employeeId)).thenReturn(Optional.of(employee));
 
-        // Act
         employeeService.deleteEmployee(employeeId);
 
-        // Assert
         verify(employeeRepository, times(1)).delete(employee);
     }
 
     @Test
     public void testDeleteEmployee_NotFound() {
-        // Arrange
+
         when(employeeRepository.findById(employeeId)).thenReturn(Optional.empty());
 
-        // Act & Assert
+
         EmployeeNotFoundException exception = assertThrows(EmployeeNotFoundException.class, () ->
                 employeeService.deleteEmployee(employeeId)
         );
@@ -163,13 +163,12 @@ public class EmployeeServiceTest {
 
     @Test
     public void testGetAllEmployees() {
-        // Arrange
+
         when(employeeRepository.findAll()).thenReturn(List.of(employee));
 
-        // Act
+
         List<Employee> employees = employeeService.getAllEmployees();
 
-        // Assert
         assertNotNull(employees);
         assertEquals(1, employees.size());
         verify(employeeRepository, times(1)).findAll();

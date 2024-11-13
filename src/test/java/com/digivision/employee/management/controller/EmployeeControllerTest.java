@@ -41,7 +41,9 @@ class EmployeeControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(employee)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.firstName").value("Abdel"));
+                .andExpect(jsonPath("$.firstName").value("Abdel"))
+                .andExpect(jsonPath("$.email").value("abdel.rahman@gmail.com"))
+                .andExpect(jsonPath("$.salary").value("55000.0"));
     }
 
     @Test
@@ -52,11 +54,15 @@ class EmployeeControllerTest {
         employee.setEmail("abdel.rahman@gmail.com");
         employee.setDepartment("Engineering");
         employee.setSalary(60000);
+
         Employee savedEmployee = employeeRepository.save(employee);
 
         mockMvc.perform(get("/api/employees/{id}", savedEmployee.getId()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.email").value("abdel.rahman@gmail.com"));
+                .andExpect(jsonPath("$.email").value("abdel.rahman@gmail.com"))
+                .andExpect(jsonPath("$.firstName").value("Abdel"))
+                .andExpect(jsonPath("$.lastName").value("Rahman"))
+                .andExpect(jsonPath("$.salary").value("60000.0"));
     }
 
     @Test

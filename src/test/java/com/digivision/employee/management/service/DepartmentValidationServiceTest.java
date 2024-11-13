@@ -2,74 +2,59 @@ package com.digivision.employee.management.service;
 
 import com.digivision.employee.management.exception.ThirdPartyException;
 import com.digivision.employee.management.thirdparty.DepartmentVerificationResponse;
-import com.digivision.employee.management.thirdparty.EmailValidationResponse;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.web.client.RestTemplate;
-
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 @SpringBootTest
 class DepartmentValidationServiceTest {
 
-    @Mock
+    @MockBean
     private RestTemplate restTemplate;
+
     @Autowired
     private DepartmentValidationService departmentValidationService;
 
-    @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this);
-    }
-
     @Test
-    void testIsValidDepartment_Success() throws ThirdPartyException {
+    void testIsValidDepartment_SuccessfulValidation() throws ThirdPartyException {
 
-        DepartmentVerificationResponse mockResponse = new DepartmentVerificationResponse();
-        mockResponse.setValid(true);
+        DepartmentVerificationResponse response = new DepartmentVerificationResponse();
+        response.setValid(true);
+        when(restTemplate.getForObject(anyString(), eq(DepartmentVerificationResponse.class))).thenReturn(response);
 
-        when(restTemplate.getForObject(anyString(), eq(DepartmentVerificationResponse.class))).thenReturn(mockResponse);
+        boolean isValid = departmentValidationService.isValidDepartment("Engineering");
 
-        // Act
-        boolean isValid = departmentValidationService.isValidDepartment("HR");
-
-        assertTrue(isValid);
+        assertTrue(isValid, "Expected department to be valid");
         verify(restTemplate, times(1)).getForObject(anyString(), eq(DepartmentVerificationResponse.class));
     }
 
     @Test
     void testIsValidDepartment_InvalidDepartment() throws ThirdPartyException {
+        DepartmentVerificationResponse response = new DepartmentVerificationResponse();
+        response.setValid(false);
+        when(restTemplate.getForObject(anyString(), eq(DepartmentVerificationResponse.class))).thenReturn(response);
 
-        DepartmentVerificationResponse mockResponse = new DepartmentVerificationResponse();
-        mockResponse.setValid(false);
+        boolean isValid = departmentValidationService.isValidDepartment("InvalidDepartment");
 
-        when(restTemplate.getForObject(anyString(), eq(DepartmentVerificationResponse.class))).thenReturn(mockResponse);
-
-        // Act
-        boolean isValid = departmentValidationService.isValidDepartment("HR");
-
-        // Assert
-        assertFalse(isValid);
+        assertFalse(isValid, "Expected department to be invalid");
         verify(restTemplate, times(1)).getForObject(anyString(), eq(DepartmentVerificationResponse.class));
     }
 
     @Test
-    void testIsValidDepartment_NullResponse() throws ThirdPartyException {
+    void testIsValidDepartment_ThrowsThirdPartyException() {
+        when(restTemplate.getForObject(anyString(), eq(DepartmentVerificationResponse.class))).thenThrow(new RuntimeException("Service unavailable"));
 
-        when(restTemplate.getForObject(anyString(), eq(DepartmentVerificationResponse.class))).thenReturn(null);
+        ThirdPartyException exception = assertThrows(ThirdPartyException.class, () -> departmentValidationService.isValidDepartment("Engineering"));
 
-        // Act
-        boolean isValid = departmentValidationService.isValidDepartment("HR");
-
-        // Assert
-        assertFalse(isValid);
+        assertEquals("Failed to validate email", exception.getMessage());
         verify(restTemplate, times(1)).getForObject(anyString(), eq(DepartmentVerificationResponse.class));
     }
 }
-

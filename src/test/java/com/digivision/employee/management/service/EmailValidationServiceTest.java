@@ -30,7 +30,7 @@ class EmailValidationServiceTest {
 
     @Test
     void testIsValidEmail_Success() throws ThirdPartyException {
-        // Arrange
+
         String email = "abdelrahman@gmail.com";
         EmailValidationResponse response = new EmailValidationResponse();
         Data data = new Data();
@@ -39,10 +39,8 @@ class EmailValidationServiceTest {
 
         when(restTemplate.getForObject(anyString(), eq(EmailValidationResponse.class))).thenReturn(response);
 
-        // Act
         boolean isValid = emailValidationService.isValidEmail(email);
 
-        // Assert
         assertTrue(isValid);
     }
 
