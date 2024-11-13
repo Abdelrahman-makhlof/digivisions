@@ -1,5 +1,8 @@
-FROM openjdk:17-oracle
+FROM openjdk:17-jdk-slim
 WORKDIR /app
-COPY ./build/libs/Employee-Management-*.jar app.jar
+
+COPY ./target/Employee-Management-*.jar app.jar
+
 EXPOSE 8080
+
 ENTRYPOINT ["java", "-jar", "app.jar"]

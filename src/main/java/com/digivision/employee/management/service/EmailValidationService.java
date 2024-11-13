@@ -1,5 +1,6 @@
 package com.digivision.employee.management.service;
 
+import com.digivision.employee.management.exception.ThirdPartyException;
 import com.digivision.employee.management.thirdparty.EmailValidationResponse;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
@@ -24,7 +25,7 @@ public class EmailValidationService {
 
     @RateLimiter(name = "emailValidationService")
     @CircuitBreaker(name = "emailValidationService", fallbackMethod = "emailValidationFallback")
-    public boolean isValidEmail(String email) {
+    public boolean isValidEmail(String email) throws ThirdPartyException {
         logger.info("Starting validation for email: {}", email);
         long startTime = System.currentTimeMillis();
         try {
@@ -44,7 +45,7 @@ public class EmailValidationService {
 
         } catch (Exception exception) {
             logger.error("Failed to validate request", exception);
-            throw exception;
+            throw new ThirdPartyException("Failed to validate email");
         }
     }
 

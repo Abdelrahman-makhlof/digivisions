@@ -1,5 +1,6 @@
 package com.digivision.employee.management.service;
 
+import com.digivision.employee.management.exception.ThirdPartyException;
 import com.digivision.employee.management.thirdparty.DepartmentVerificationResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,12 +22,15 @@ public class DepartmentValidationService {
 
     private static final Logger logger = LoggerFactory.getLogger(DepartmentValidationService.class);
 
-    public boolean isValidDepartment(String department) {
+    public boolean isValidDepartment(String department) throws ThirdPartyException {
         logger.info("Start department validation");
-        String url = UriComponentsBuilder.fromHttpUrl(departmentVerificationApiUrl)
-                .queryParam("department", department)
-                .queryParam("api_key", apiKey) // Use your API key here
-                .toUriString();
+
+       try {
+           String url = UriComponentsBuilder.fromHttpUrl(departmentVerificationApiUrl)
+                   .queryParam("department", department)
+                   .queryParam("api_key", apiKey) // Use your API key here
+                   .toUriString();
+
         logger.debug("Request: {}", url);
         DepartmentVerificationResponse response = restTemplate.getForObject(url, DepartmentVerificationResponse.class);
         logger.debug("Response: {}", response);
@@ -34,5 +38,9 @@ public class DepartmentValidationService {
         logger.info("Valid department status: {}", valid);
 
         return valid;
+       } catch (Exception exception) {
+           logger.error("Failed to validate department", exception);
+           throw new ThirdPartyException("Failed to validate email");
+       }
     }
 }

@@ -1,5 +1,6 @@
 package com.digivision.employee.management.service;
 
+import com.digivision.employee.management.exception.ThirdPartyException;
 import com.digivision.employee.management.thirdparty.EmailValidationResponse;
 import com.digivision.employee.management.thirdparty.EmailValidationResponse.Data;
 import org.junit.jupiter.api.BeforeEach;
@@ -28,7 +29,7 @@ class EmailValidationServiceTest {
     }
 
     @Test
-    void testIsValidEmail_Success() {
+    void testIsValidEmail_Success() throws ThirdPartyException {
         // Arrange
         String email = "abdelrahman@gmail.com";
         EmailValidationResponse response = new EmailValidationResponse();
@@ -46,8 +47,8 @@ class EmailValidationServiceTest {
     }
 
     @Test
-    void testIsValidEmail_InvalidEmail() {
-        // Arrange
+    void testIsValidEmail_InvalidEmail() throws ThirdPartyException {
+
         String email = "invalid@example.com";
         EmailValidationResponse response = new EmailValidationResponse();
         Data data = new Data();
@@ -56,22 +57,18 @@ class EmailValidationServiceTest {
 
         when(restTemplate.getForObject(anyString(), eq(EmailValidationResponse.class))).thenReturn(response);
 
-        // Act
         boolean isValid = emailValidationService.isValidEmail(email);
-
-        // Assert
         assertFalse(isValid);
     }
 
     @Test
     void testIsValidEmail_ExceptionHandling() {
-        // Arrange
+
         String email = "error@example.com";
         when(restTemplate.getForObject(anyString(), eq(EmailValidationResponse.class)))
                 .thenThrow(new RuntimeException("API error"));
 
-        // Act & Assert
-        assertThrows(RuntimeException.class, () -> emailValidationService.isValidEmail(email));
+        assertThrows(ThirdPartyException.class, () -> emailValidationService.isValidEmail(anyString()));
     }
 }
 

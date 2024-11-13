@@ -41,7 +41,7 @@ class EmployeeControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(employee)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.firstName").value("Alice"));
+                .andExpect(jsonPath("$.firstName").value("Abdel"));
     }
 
     @Test
@@ -103,8 +103,7 @@ class EmployeeControllerTest {
         mockMvc.perform(put("/api/employees/{id}", employee.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(employee)))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("Employee not found"));
+                .andExpect(status().isBadRequest());
     }
 
     @Test

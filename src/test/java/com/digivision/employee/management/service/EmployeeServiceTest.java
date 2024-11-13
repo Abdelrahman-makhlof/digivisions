@@ -74,7 +74,7 @@ public class EmployeeServiceTest {
     }
 
     @Test
-    public void testCreateEmployee_InvalidEmail() {
+    public void testCreateEmployee_InvalidEmail() throws ThirdPartyException {
         // Arrange
         when(emailValidationService.isValidEmail(employee.getEmail())).thenReturn(false);
 
